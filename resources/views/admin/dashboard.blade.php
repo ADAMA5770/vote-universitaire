@@ -72,7 +72,24 @@
                 </div>
             </div>
             <div class="card-footer bg-black bg-opacity-10 border-0 py-2">
-                <small class="text-dark opacity-50">Comptes étudiants</small>
+                <a href="{{ route('admin.etudiants.index') }}" class="text-dark opacity-50 small text-decoration-none">
+                    Gérer <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-3">
+        <div class="card border-0 text-white h-100" style="background: linear-gradient(135deg, #6f42c1, #59359a);">
+            <div class="card-body d-flex align-items-center gap-3">
+                <i class="bi bi-person-badge-fill opacity-75" style="font-size: 2.5rem;"></i>
+                <div>
+                    <div class="fs-2 fw-bold lh-1">{{ $nbCandidats }}</div>
+                    <div class="opacity-75 mt-1">Candidats</div>
+                </div>
+            </div>
+            <div class="card-footer bg-black bg-opacity-10 border-0 py-2">
+                <small class="text-white-50">Toutes élections confondues</small>
             </div>
         </div>
     </div>

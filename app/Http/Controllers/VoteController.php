@@ -12,6 +12,11 @@ class VoteController extends Controller
 {
     public function voter(Request $request, Election $election)
     {
+        // [SÉCURITÉ] Seuls les comptes étudiants peuvent voter (pas les admins)
+        if (Auth::user()->role !== 'etudiant') {
+            return back()->with('error', 'Seuls les étudiants peuvent participer aux votes.');
+        }
+
         // [SÉCURITÉ] Vérifier que l'élection est active
         if ($election->statut !== 'active') {
             return back()->with('error', "Cette élection n'est pas active et n'accepte plus de votes.");

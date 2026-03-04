@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class LoginController extends Controller
 {
@@ -15,24 +17,35 @@ class LoginController extends Controller
 
     public function login(Request $request)
     {
-        $credentials = $request->validate([
-            'email'    => 'required|email',
-            'password' => 'required',
+        $request->validate([
+            'identifiant' => 'required|string',
+            'password'    => 'required',
         ]);
 
-        if (Auth::attempt($credentials, $request->boolean('remember'))) {
-            $request->session()->regenerate();
+        $identifiant = trim($request->identifiant);
 
-            if (Auth::user()->isAdmin()) {
-                return redirect()->route('admin.dashboard');
-            }
-
-            return redirect()->route('elections.index');
+        // Chercher l'utilisateur par email OU par numéro étudiant
+        if (filter_var($identifiant, FILTER_VALIDATE_EMAIL)) {
+            $user = User::where('email', $identifiant)->first();
+        } else {
+            $user = User::where('numero_etudiant', $identifiant)->first();
         }
 
-        return back()->withErrors([
-            'email' => 'Les identifiants sont incorrects.',
-        ])->onlyInput('email');
+        // Vérifier l'existence et le mot de passe
+        if (!$user || !Hash::check($request->password, $user->password)) {
+            return back()->withErrors([
+                'identifiant' => 'Identifiant ou mot de passe incorrect.',
+            ])->onlyInput('identifiant');
+        }
+
+        Auth::login($user, $request->boolean('remember'));
+        $request->session()->regenerate();
+
+        if ($user->isAdmin()) {
+            return redirect()->route('admin.dashboard');
+        }
+
+        return redirect()->route('elections.index');
     }
 
     public function logout(Request $request)

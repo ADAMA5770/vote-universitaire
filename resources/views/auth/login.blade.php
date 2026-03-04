@@ -22,13 +22,13 @@
                     @csrf
 
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">Adresse email</label>
-                        <input type="email" name="email"
-                               class="form-control @error('email') is-invalid @enderror"
-                               value="{{ old('email') }}"
-                               placeholder="votremail@exemple.com"
+                        <label class="form-label fw-semibold">Numéro étudiant ou Email</label>
+                        <input type="text" name="identifiant"
+                               class="form-control @error('identifiant') is-invalid @enderror"
+                               value="{{ old('identifiant') }}"
+                               placeholder="2024-GL-001 ou email@exemple.com"
                                required autofocus>
-                        @error('email')
+                        @error('identifiant')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
@@ -54,10 +54,6 @@
                         </button>
                     </div>
                 </form>
-            </div>
-            <div class="card-footer text-center py-3 bg-light">
-                <span class="text-muted small">Pas encore de compte ? </span>
-                <a href="{{ route('register') }}" class="fw-semibold small">S'inscrire</a>
             </div>
         </div>
 

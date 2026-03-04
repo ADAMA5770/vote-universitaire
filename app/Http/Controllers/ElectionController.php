@@ -67,6 +67,8 @@ class ElectionController extends Controller
 
     public function edit(Election $election)
     {
+        $election->load('candidats');
+
         return view('admin.elections.edit', compact('election'));
     }
 
