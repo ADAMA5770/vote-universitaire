@@ -8,9 +8,14 @@
         <h2 class="mb-1"><i class="bi bi-speedometer2 text-primary me-2"></i>Tableau de bord</h2>
         <p class="text-muted mb-0">Vue d'ensemble du système de vote</p>
     </div>
-    <a href="{{ route('admin.elections.create') }}" class="btn btn-primary">
-        <i class="bi bi-plus-circle me-2"></i>Nouvelle élection
-    </a>
+    <div class="d-flex gap-2">
+        <a href="{{ route('admin.etudiants.create') }}" class="btn btn-success">
+            <i class="bi bi-person-plus me-2"></i>Nouvel étudiant
+        </a>
+        <a href="{{ route('admin.elections.create') }}" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-2"></i>Nouvelle élection
+        </a>
+    </div>
 </div>
 
 {{-- Cartes de statistiques --}}

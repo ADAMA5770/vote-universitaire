@@ -77,12 +77,7 @@
                             <i class="bi bi-box-arrow-in-right me-1"></i>Connexion
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('register') }}">
-                            <i class="bi bi-person-plus me-1"></i>Inscription
-                        </a>
-                    </li>
-                @endauth
+@endauth
             </ul>
         </div>
     </div>
