@@ -64,10 +64,20 @@
                                        class="btn btn-outline-info" title="Résultats">
                                         <i class="bi bi-bar-chart"></i>
                                     </a>
-                                    <a href="{{ route('admin.elections.edit', $election) }}"
-                                       class="btn btn-outline-primary" title="Modifier">
-                                        <i class="bi bi-pencil"></i>
-                                    </a>
+                                    @if($election->statut === 'active')
+                                        <button type="button"
+                                                class="btn btn-outline-primary disabled"
+                                                style="opacity:.4; cursor:not-allowed;"
+                                                title="Modification impossible : l'élection est active"
+                                                data-bs-toggle="tooltip" data-bs-placement="top">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                    @else
+                                        <a href="{{ route('admin.elections.edit', $election) }}"
+                                           class="btn btn-outline-primary" title="Modifier">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                    @endif
                                     {{-- [SÉCURITÉ] Suppression interdite si des votes ont déjà été enregistrés --}}
                                     @if($election->votes()->count() > 0)
                                         <button type="button"

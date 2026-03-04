@@ -32,6 +32,7 @@ Route::middleware('auth')->group(function () {
     // Votes
     Route::post('/elections/{election}/voter', [VoteController::class, 'voter'])->name('elections.voter');
     Route::get('/elections/{election}/resultats', [VoteController::class, 'resultats'])->name('elections.resultats');
+    Route::get('/elections/{election}/resultats/pdf', [VoteController::class, 'exportPdf'])->name('elections.resultats.pdf');
 
     // Administration
     Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {

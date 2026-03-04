@@ -177,7 +177,8 @@
                     <h6 class="fw-semibold mb-3">
                         <i class="bi bi-person-plus me-2 text-primary"></i>Ajouter un candidat
                     </h6>
-                    <form method="POST" action="{{ route('admin.candidats.store', $election) }}">
+                    <form method="POST" action="{{ route('admin.candidats.store', $election) }}"
+                          enctype="multipart/form-data">
                         @csrf
                         <div class="row g-3">
                             <div class="col-sm-6">
@@ -193,6 +194,14 @@
                                        placeholder="Nom *"
                                        value="{{ old('nom') }}" required>
                                 @error('nom')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label small fw-semibold text-muted mb-1">
+                                    <i class="bi bi-camera me-1"></i>Photo (optionnel — JPG/PNG/WebP, max 2 Mo)
+                                </label>
+                                <input type="file" name="photo" accept="image/jpeg,image/png,image/webp"
+                                       class="form-control @error('photo') is-invalid @enderror">
+                                @error('photo')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             </div>
                             <div class="col-12">
                                 <textarea name="programme"

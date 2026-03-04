@@ -15,6 +15,10 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
         ]);
     })
+    ->withSchedule(function (\Illuminate\Console\Scheduling\Schedule $schedule): void {
+        // Met à jour automatiquement les statuts des élections toutes les heures
+        $schedule->command('elections:update-statut')->hourly();
+    })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
     })->create();

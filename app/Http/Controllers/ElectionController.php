@@ -20,7 +20,6 @@ class ElectionController extends Controller
     public function show(Election $election)
     {
         // [SÉCURITÉ] Un étudiant ne peut accéder qu'aux élections actives
-        // (évite l'accès direct via URL à une élection en_attente ou terminée)
         if (!Auth::user()->isAdmin() && $election->statut !== 'active') {
             return redirect()->route('elections.index')
                 ->with('error', "Cette élection n'est pas accessible.");
@@ -55,7 +54,6 @@ class ElectionController extends Controller
             'statut'      => 'required|in:en_attente,active,terminee',
         ]);
 
-        // [SÉCURITÉ] Protection XSS : supprimer toute balise HTML des champs texte
         $validated['titre']       = strip_tags($validated['titre']);
         $validated['description'] = isset($validated['description']) ? strip_tags($validated['description']) : null;
 
@@ -67,6 +65,12 @@ class ElectionController extends Controller
 
     public function edit(Election $election)
     {
+        // [SÉCURITÉ] Impossible de modifier une élection active (votes en cours)
+        if ($election->statut === 'active') {
+            return redirect()->route('admin.elections.index')
+                ->with('error', "Impossible de modifier « {$election->titre} » : l'élection est active. Clôturez-la d'abord.");
+        }
+
         $election->load('candidats');
 
         return view('admin.elections.edit', compact('election'));
@@ -74,6 +78,12 @@ class ElectionController extends Controller
 
     public function update(Request $request, Election $election)
     {
+        // [SÉCURITÉ] Double vérification côté serveur
+        if ($election->statut === 'active') {
+            return redirect()->route('admin.elections.index')
+                ->with('error', "Impossible de modifier une élection active.");
+        }
+
         $validated = $request->validate([
             'titre'       => 'required|string|max:255',
             'description' => 'nullable|string|max:2000',
@@ -82,7 +92,6 @@ class ElectionController extends Controller
             'statut'      => 'required|in:en_attente,active,terminee',
         ]);
 
-        // [SÉCURITÉ] Protection XSS : supprimer toute balise HTML des champs texte
         $validated['titre']       = strip_tags($validated['titre']);
         $validated['description'] = isset($validated['description']) ? strip_tags($validated['description']) : null;
 

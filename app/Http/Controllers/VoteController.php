@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Election;
 use App\Models\Vote;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class VoteController extends Controller
 {
@@ -44,8 +46,6 @@ class VoteController extends Controller
             ]);
         } catch (QueryException $e) {
             // [SÉCURITÉ] Protection contre les race conditions (double clic / double requête simultanée)
-            // La contrainte UNIQUE (election_id, user_id) en BDD bloque le double vote même si la
-            // vérification applicative ci-dessus passe deux fois en parallèle.
             return back()->with('error', 'Vous avez déjà voté pour cette élection.');
         }
 
@@ -66,6 +66,33 @@ class VoteController extends Controller
             }
         }
 
+        [$candidats, $totalVotes] = $this->buildResultats($election);
+
+        return view('elections.resultats', compact('election', 'candidats', 'totalVotes'));
+    }
+
+    public function exportPdf(Election $election)
+    {
+        // Même contrôle d'accès que resultats()
+        if (!Auth::user()->isAdmin()) {
+            $aVote = Auth::user()->votes()->where('election_id', $election->id)->exists();
+            if (!$aVote && $election->statut !== 'terminee') {
+                return redirect()->route('elections.show', $election)
+                    ->with('error', 'Vous devez voter avant de consulter les résultats.');
+            }
+        }
+
+        [$candidats, $totalVotes] = $this->buildResultats($election);
+
+        $pdf = Pdf::loadView('elections.resultats-pdf', compact('election', 'candidats', 'totalVotes'));
+        $pdf->setPaper('A4', 'portrait');
+
+        return $pdf->download('resultats-' . Str::slug($election->titre) . '.pdf');
+    }
+
+    // Méthode partagée : construit le tableau des résultats
+    private function buildResultats(Election $election): array
+    {
         $election->load('candidats.votes');
         $totalVotes = $election->votes()->count();
 
@@ -75,11 +102,12 @@ class VoteController extends Controller
 
             return [
                 'nom'         => $candidat->prenom . ' ' . $candidat->nom,
+                'photo'       => $candidat->photo,
                 'nb_votes'    => $nbVotes,
                 'pourcentage' => $pourcentage,
             ];
         })->sortByDesc('nb_votes')->values();
 
-        return view('elections.resultats', compact('election', 'candidats', 'totalVotes'));
+        return [$candidats, $totalVotes];
     }
 }
