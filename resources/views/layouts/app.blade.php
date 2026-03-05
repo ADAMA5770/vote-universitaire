@@ -8,71 +8,139 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     <style>
         :root {
-            --blue:   #2563EB;
-            --violet: #7C3AED;
-            --green:  #059669;
-            --red:    #DC2626;
+            --navy:  #1E3A5F;
+            --gold:  #C8A951;
+            --green: #2D6A4F;
+            --red:   #C1121F;
+            --bg:    #F8F9FA;
+            --text:  #212529;
         }
-        body { background: #f1f5f9; min-height: 100vh; display: flex; flex-direction: column; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
         main { flex: 1; }
 
         /* ── Navbar ── */
         .navbar-app {
-            background: linear-gradient(135deg, #1e3a8a 0%, #5b21b6 100%);
-            box-shadow: 0 2px 12px rgba(0,0,0,.25);
+            background: var(--navy);
+            box-shadow: 0 2px 10px rgba(0,0,0,.2);
+            padding: .7rem 0;
         }
         .navbar-app .navbar-brand {
-            font-weight: 800;
-            font-size: 1.15rem;
-            letter-spacing: .3px;
             color: #fff !important;
+            font-weight: 800;
+            font-size: 1.05rem;
+            letter-spacing: .2px;
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+        }
+        .navbar-app .brand-icon {
+            width: 34px; height: 34px;
+            background: var(--gold);
+            color: var(--navy);
+            border-radius: 7px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
         }
         .navbar-app .nav-link {
-            color: rgba(255,255,255,.80) !important;
+            color: rgba(255,255,255,.78) !important;
             font-weight: 500;
-            padding: .5rem .9rem !important;
-            border-radius: 8px;
-            transition: background .2s, color .2s;
+            padding: .45rem .85rem !important;
+            border-radius: 6px;
+            transition: color .2s;
+            position: relative;
         }
-        .navbar-app .nav-link:hover,
-        .navbar-app .nav-link.active {
-            background: rgba(255,255,255,.15);
-            color: #fff !important;
+        .navbar-app .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: .85rem; right: .85rem;
+            height: 2px;
+            background: var(--gold);
+            border-radius: 2px;
+            transform: scaleX(0);
+            transition: transform .2s ease;
         }
+        .navbar-app .nav-link:hover { color: #fff !important; }
+        .navbar-app .nav-link:hover::after,
+        .navbar-app .nav-link.active::after { transform: scaleX(1); }
+        .navbar-app .nav-link.active { color: #fff !important; }
+
         .navbar-app .dropdown-menu {
             border: none;
-            box-shadow: 0 8px 30px rgba(0,0,0,.15);
-            border-radius: 12px;
+            border-top: 3px solid var(--gold);
+            box-shadow: 0 8px 30px rgba(0,0,0,.12);
+            border-radius: 0 0 10px 10px;
+        }
+        .badge-admin {
+            background: var(--gold);
+            color: var(--navy);
+            font-size: .62rem;
+            font-weight: 700;
+            padding: .25em .6em;
+            border-radius: 4px;
+            letter-spacing: .3px;
         }
 
         /* ── Cards ── */
         .card {
             border: none;
             box-shadow: 0 1px 6px rgba(0,0,0,.07);
-            border-radius: 12px;
-        }
-        .card-hover {
-            transition: transform .2s, box-shadow .2s;
-            cursor: pointer;
-        }
-        .card-hover:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 24px rgba(37,99,235,.18);
-        }
-
-        /* ── Alerts flash ── */
-        .alert-flash {
-            border: none;
             border-radius: 10px;
-            font-weight: 500;
+        }
+        .card-hover { transition: transform .2s, box-shadow .2s; }
+        .card-hover:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(30,58,95,.15);
         }
 
-        /* ── Animations ── */
+        /* ── Buttons ── */
+        .btn-navy {
+            background: var(--navy);
+            color: #fff;
+            border: none;
+            font-weight: 600;
+            transition: opacity .2s;
+        }
+        .btn-navy:hover { opacity: .88; color: #fff; }
+        .btn-gold-solid {
+            background: var(--gold);
+            color: var(--navy);
+            border: none;
+            font-weight: 700;
+            transition: opacity .2s;
+        }
+        .btn-gold-solid:hover { opacity: .88; color: var(--navy); }
+
+        /* ── Alerts ── */
+        .alert { border: none; border-radius: 8px; border-left: 4px solid; }
+        .alert-success { border-color: var(--green); }
+        .alert-danger  { border-color: var(--red); }
+
+        /* ── Fade-in ── */
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
+            from { opacity: 0; transform: translateY(10px); }
             to   { opacity: 1; transform: translateY(0); }
         }
-        .fade-in { animation: fadeIn .35s ease both; }
+        .fade-in { animation: fadeIn .3s ease both; }
+
+        /* ── Avatar initiale ── */
+        .avatar-initial {
+            width: 34px; height: 34px;
+            background: rgba(255,255,255,.2);
+            border: 1px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: .82rem; color: #fff;
+            flex-shrink: 0;
+        }
     </style>
     @stack('styles')
 </head>
@@ -80,14 +148,13 @@
 
 <nav class="navbar navbar-expand-lg navbar-app">
     <div class="container">
-        <a class="navbar-brand d-flex align-items-center gap-2" href="{{ route('home') }}">
-            <div style="background:rgba(255,255,255,.2); border-radius:8px; padding:4px 8px;">
-                <i class="bi bi-ballot-fill" style="font-size:1.1rem;"></i>
-            </div>
+        <a class="navbar-brand" href="{{ route('home') }}">
+            <div class="brand-icon"><i class="bi bi-mortarboard-fill"></i></div>
             Vote Universitaire
         </a>
-        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
+        <button class="navbar-toggler border-0 text-white" type="button"
+                data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <i class="bi bi-list fs-4"></i>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto ms-3 gap-1">
@@ -95,7 +162,7 @@
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('elections.*') && !request()->routeIs('admin.*') ? 'active' : '' }}"
                            href="{{ route('elections.index') }}">
-                            <i class="bi bi-list-check me-1"></i>Élections
+                            <i class="bi bi-ballot me-1"></i>Élections
                         </a>
                     </li>
                     @if(auth()->user()->isAdmin())
@@ -108,30 +175,34 @@
                     @endif
                 @endauth
             </ul>
-            <ul class="navbar-nav ms-auto">
+
+            <ul class="navbar-nav ms-auto align-items-center">
                 @auth
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#"
                            data-bs-toggle="dropdown">
-                            <div class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold"
-                                 style="width:32px;height:32px;background:rgba(255,255,255,.25);font-size:.8rem;flex-shrink:0;">
+                            <div class="avatar-initial">
                                 {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
                             </div>
-                            <span class="d-none d-sm-inline">{{ auth()->user()->name }}</span>
+                            <span class="d-none d-sm-inline" style="color:rgba(255,255,255,.85);">
+                                {{ auth()->user()->name }}
+                            </span>
                             @if(auth()->user()->isAdmin())
-                                <span class="badge ms-1" style="background:#fbbf24; color:#1e1b4b; font-size:.65rem;">Admin</span>
+                                <span class="badge-admin">ADMIN</span>
                             @endif
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end shadow">
+                        <ul class="dropdown-menu dropdown-menu-end">
                             <li>
-                                <span class="dropdown-item-text small text-muted">
-                                    <i class="bi bi-envelope me-1"></i>{{ auth()->user()->email }}
+                                <span class="dropdown-item-text small text-muted py-1">
+                                    <i class="bi bi-envelope me-1" style="color:var(--gold);"></i>
+                                    {{ auth()->user()->email }}
                                 </span>
                             </li>
                             @if(auth()->user()->numero_etudiant)
                                 <li>
-                                    <span class="dropdown-item-text small text-muted">
-                                        <i class="bi bi-credit-card-2-front me-1"></i>{{ auth()->user()->numero_etudiant }}
+                                    <span class="dropdown-item-text small text-muted py-1">
+                                        <i class="bi bi-credit-card-2-front me-1" style="color:var(--gold);"></i>
+                                        {{ auth()->user()->numero_etudiant }}
                                     </span>
                                 </li>
                             @endif
@@ -139,7 +210,7 @@
                             <li>
                                 <form method="POST" action="{{ route('logout') }}">
                                     @csrf
-                                    <button type="submit" class="dropdown-item text-danger">
+                                    <button type="submit" class="dropdown-item text-danger fw-semibold">
                                         <i class="bi bi-box-arrow-right me-2"></i>Déconnexion
                                     </button>
                                 </form>
@@ -160,16 +231,15 @@
 
 <main class="container my-4 fade-in">
     @if(session('success'))
-        <div class="alert alert-success alert-flash alert-dismissible fade show d-flex align-items-center mb-4" role="alert">
-            <i class="bi bi-check-circle-fill me-2 fs-5"></i>
+        <div class="alert alert-success alert-dismissible fade show d-flex align-items-center mb-4" role="alert">
+            <i class="bi bi-check-circle-fill me-2 fs-5" style="color:var(--green);"></i>
             <div>{{ session('success') }}</div>
             <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
         </div>
     @endif
-
     @if(session('error'))
-        <div class="alert alert-danger alert-flash alert-dismissible fade show d-flex align-items-center mb-4" role="alert">
-            <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
+        <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2 fs-5" style="color:var(--red);"></i>
             <div>{{ session('error') }}</div>
             <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
         </div>
@@ -178,10 +248,10 @@
     @yield('content')
 </main>
 
-<footer class="text-center py-4 mt-auto" style="background:#fff; border-top:1px solid #e2e8f0;">
+<footer class="text-center py-3 mt-auto" style="background:#fff; border-top: 3px solid var(--gold);">
     <small class="text-muted">
-        <i class="bi bi-mortarboard me-1 text-primary"></i>
-        &copy; {{ date('Y') }} Vote Universitaire &mdash; L3 Génie Logiciel
+        <i class="bi bi-mortarboard me-1" style="color:var(--navy);"></i>
+        &copy; {{ date('Y') }} Vote Universitaire — Département Génie Logiciel
     </small>
 </footer>
 
