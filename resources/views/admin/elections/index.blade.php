@@ -20,6 +20,32 @@
     </div>
 </div>
 
+{{-- Barre de recherche --}}
+<div class="card border-0 mb-3 px-3 py-3" style="background:#f8f9fa;">
+    <div class="row g-2 align-items-center">
+        <div class="col-sm-6">
+            <div class="input-group input-group-sm">
+                <span class="input-group-text bg-white border-end-0">
+                    <i class="bi bi-search text-muted"></i>
+                </span>
+                <input type="text" id="searchTitre" class="form-control border-start-0"
+                       placeholder="Rechercher par titre…">
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <select id="filterStatut" class="form-select form-select-sm">
+                <option value="">Tous les statuts</option>
+                <option value="active">Active</option>
+                <option value="en_attente">En attente</option>
+                <option value="terminee">Terminée</option>
+            </select>
+        </div>
+        <div class="col-sm-2 text-end">
+            <small class="text-muted" id="countVisible"></small>
+        </div>
+    </div>
+</div>
+
 <div class="card border-0 overflow-hidden">
     <div class="table-responsive">
         <table class="table table-hover mb-0 align-middle">
@@ -45,7 +71,7 @@
             </thead>
             <tbody>
                 @forelse($elections as $election)
-                    <tr>
+                    <tr data-titre="{{ strtolower($election->titre) }}" data-statut="{{ $election->statut }}">
                         <td class="ps-4 py-3 text-muted small">{{ $election->id }}</td>
                         <td class="py-3 fw-semibold" style="color:var(--navy);">{{ $election->titre }}</td>
                         <td class="py-3">
@@ -152,6 +178,24 @@
     document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
         new bootstrap.Tooltip(el);
     });
+
+    // Recherche + filtre JS
+    function filterElections() {
+        const q      = document.getElementById('searchTitre').value.toLowerCase();
+        const statut = document.getElementById('filterStatut').value;
+        const rows   = document.querySelectorAll('table tbody tr[data-titre]');
+        let visible  = 0;
+        rows.forEach(row => {
+            const matchTitre  = row.dataset.titre.includes(q);
+            const matchStatut = !statut || row.dataset.statut === statut;
+            const show = matchTitre && matchStatut;
+            row.style.display = show ? '' : 'none';
+            if (show) visible++;
+        });
+        document.getElementById('countVisible').textContent = visible + ' résultat(s)';
+    }
+    document.getElementById('searchTitre').addEventListener('input', filterElections);
+    document.getElementById('filterStatut').addEventListener('change', filterElections);
 </script>
 @endpush
 @endsection

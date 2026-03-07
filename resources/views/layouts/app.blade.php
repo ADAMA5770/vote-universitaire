@@ -165,11 +165,25 @@
                             <i class="bi bi-ballot me-1"></i>Élections
                         </a>
                     </li>
+                    @if(!auth()->user()->isAdmin())
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('etudiant.*') ? 'active' : '' }}"
+                               href="{{ route('etudiant.historique') }}">
+                                <i class="bi bi-clock-history me-1"></i>Mes votes
+                            </a>
+                        </li>
+                    @endif
                     @if(auth()->user()->isAdmin())
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin.*') ? 'active' : '' }}"
                                href="{{ route('admin.dashboard') }}">
                                 <i class="bi bi-speedometer2 me-1"></i>Administration
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.logs') ? 'active' : '' }}"
+                               href="{{ route('admin.logs') }}">
+                                <i class="bi bi-journal-text me-1"></i>Journal
                             </a>
                         </li>
                     @endif
@@ -206,6 +220,17 @@
                                     </span>
                                 </li>
                             @endif
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" href="{{ route('profil.index') }}">
+                                    <i class="bi bi-person-circle me-2" style="color:var(--navy);"></i>Mon profil
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{{ route('documentation') }}" target="_blank">
+                                    <i class="bi bi-file-earmark-text me-2" style="color:var(--gold);"></i>Documentation
+                                </a>
+                            </li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
                                 <form method="POST" action="{{ route('logout') }}">

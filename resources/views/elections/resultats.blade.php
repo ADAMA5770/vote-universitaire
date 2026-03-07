@@ -157,6 +157,17 @@
             </div>
         @endif
 
+        {{-- Pie chart ────────────────────────────────── --}}
+        @if($totalVotes > 0 && $candidats->count() >= 2)
+            <div class="card border-0 mt-4">
+                <div class="card-body p-4 text-center">
+                    <div style="max-width:300px; margin:0 auto;">
+                        <canvas id="pieChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        @endif
+
         {{-- Actions ──────────────────────────────────── --}}
         <div class="d-flex flex-wrap gap-2 align-items-center mt-4">
             @if($election->statut === 'active')
@@ -167,6 +178,14 @@
             <a href="{{ route('elections.resultats.pdf', $election) }}" class="btn btn-gold-solid fw-bold">
                 <i class="bi bi-file-earmark-pdf me-2"></i>Télécharger PDF
             </a>
+            @auth
+                @php $aVote = Auth::user()->votes()->where('election_id', $election->id)->exists(); @endphp
+                @if($aVote)
+                    <a href="{{ route('elections.bulletin', $election) }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-file-earmark-check me-2"></i>Mon bulletin
+                    </a>
+                @endif
+            @endauth
             <a href="{{ route('elections.index') }}" class="btn btn-outline-secondary ms-auto">
                 <i class="bi bi-arrow-left me-2"></i>Retour
             </a>
@@ -184,6 +203,7 @@
 </style>
 @endpush
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
 <script>
     document.querySelectorAll('.progress-bar[data-width]').forEach(bar => {
         setTimeout(() => {
@@ -191,6 +211,39 @@
             bar.style.width = bar.dataset.width + '%';
         }, 300);
     });
+
+    const pieCtx = document.getElementById('pieChart');
+    if (pieCtx) {
+        const labels = {!! json_encode($candidats->pluck('nom')) !!};
+        const data   = {!! json_encode($candidats->pluck('nb_votes')) !!};
+        const colors = ['#C8A951','#1E3A5F','#2D6A4F','#C1121F','#7b8fa1','#b07d44'];
+        new Chart(pieCtx, {
+            type: 'doughnut',
+            data: {
+                labels,
+                datasets: [{
+                    data,
+                    backgroundColor: colors.slice(0, labels.length),
+                    borderWidth: 2,
+                    borderColor: '#fff',
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { padding: 16, font: { size: 12 } }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: ctx => ` ${ctx.label} : ${ctx.parsed} vote(s)`
+                        }
+                    }
+                }
+            }
+        });
+    }
 </script>
 @endpush
 @endsection

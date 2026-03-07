@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Candidat;
 use App\Models\Election;
+use App\Models\LogActivite;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -30,6 +31,8 @@ class CandidatController extends Controller
         }
 
         Candidat::create($validated);
+
+        LogActivite::log('candidat_cree', "Candidat « {$validated['prenom']} {$validated['nom']} » ajouté à « {$election->titre} »");
 
         return redirect()->route('admin.elections.edit', $election)
             ->with('success', "Candidat « {$validated['prenom']} {$validated['nom']} » ajouté avec succès.");

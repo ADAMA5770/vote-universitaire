@@ -20,6 +20,24 @@
     </div>
 </div>
 
+{{-- Barre de recherche --}}
+<div class="card border-0 mb-3 px-3 py-3" style="background:#f8f9fa;">
+    <div class="row g-2 align-items-center">
+        <div class="col-sm-8">
+            <div class="input-group input-group-sm">
+                <span class="input-group-text bg-white border-end-0">
+                    <i class="bi bi-search text-muted"></i>
+                </span>
+                <input type="text" id="searchEtudiant" class="form-control border-start-0"
+                       placeholder="Rechercher par nom ou numéro étudiant…">
+            </div>
+        </div>
+        <div class="col-sm-4 text-end">
+            <small class="text-muted" id="countEtudiants"></small>
+        </div>
+    </div>
+</div>
+
 <div class="card border-0 overflow-hidden">
     <div class="table-responsive">
         <table class="table table-hover mb-0 align-middle">
@@ -45,7 +63,8 @@
                         ];
                         $avatarBg = $avatarColors[$etudiant->id % count($avatarColors)];
                     @endphp
-                    <tr>
+                    <tr data-nom="{{ strtolower($etudiant->name) }}"
+                        data-numero="{{ strtolower($etudiant->numero_etudiant ?? '') }}">
                         <td class="ps-4 py-3">
                             <div class="d-flex align-items-center gap-3">
                                 <div class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold flex-shrink-0"
@@ -110,4 +129,21 @@
         </table>
     </div>
 </div>
+@push('scripts')
+<script>
+    const input = document.getElementById('searchEtudiant');
+    const countEl = document.getElementById('countEtudiants');
+    input.addEventListener('input', function () {
+        const q    = this.value.toLowerCase();
+        const rows = document.querySelectorAll('table tbody tr[data-nom]');
+        let visible = 0;
+        rows.forEach(row => {
+            const match = row.dataset.nom.includes(q) || row.dataset.numero.includes(q);
+            row.style.display = match ? '' : 'none';
+            if (match) visible++;
+        });
+        countEl.textContent = visible + ' résultat(s)';
+    });
+</script>
+@endpush
 @endsection

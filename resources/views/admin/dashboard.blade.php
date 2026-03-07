@@ -10,7 +10,16 @@
         </h2>
         <p class="text-muted mb-0">Vue d'ensemble du système de vote universitaire</p>
     </div>
-    <div class="d-flex gap-2">
+    <div class="d-flex gap-2 flex-wrap">
+        {{-- Toggle maintenance --}}
+        <form method="POST" action="{{ route('admin.maintenance') }}" class="d-inline">
+            @csrf
+            <button type="submit" class="btn fw-semibold {{ $maintenance ? 'btn-warning' : 'btn-outline-warning' }}"
+                    title="{{ $maintenance ? 'Désactiver la maintenance' : 'Activer la maintenance' }}">
+                <i class="bi bi-tools me-1"></i>
+                {{ $maintenance ? 'Maintenance ON' : 'Maintenance OFF' }}
+            </button>
+        </form>
         <a href="{{ route('admin.etudiants.create') }}" class="btn btn-navy fw-semibold">
             <i class="bi bi-person-plus me-2"></i>Nouvel étudiant
         </a>
@@ -156,6 +165,32 @@
 
 </div>
 
+{{-- Alerte maintenance ──────────────────────────────────────── --}}
+@if($maintenance)
+<div class="alert mb-4 d-flex align-items-center gap-3"
+     style="background:#fff3e0; border-left:4px solid #e65100; border-radius:8px;">
+    <i class="bi bi-tools fs-4" style="color:#e65100;"></i>
+    <div>
+        <strong style="color:#e65100;">Mode maintenance actif</strong>
+        <div class="small text-muted">Les étudiants voient la page de maintenance. Vous seul y avez accès.</div>
+    </div>
+</div>
+@endif
+
+{{-- Chart.js : votes par élection ───────────────────────── --}}
+@if($chartData->sum() > 0)
+<div class="card border-0 mb-4">
+    <div class="card-header bg-white py-3" style="border-bottom:2px solid #f0f2f5;">
+        <h6 class="mb-0 fw-bold" style="color:var(--navy);">
+            <i class="bi bi-bar-chart-fill me-2" style="color:var(--gold);"></i>Votes par élection
+        </h6>
+    </div>
+    <div class="card-body p-4">
+        <canvas id="chartVotes" height="90"></canvas>
+    </div>
+</div>
+@endif
+
 {{-- Dernières élections ───────────────────────────────── --}}
 <div class="card border-0">
     <div class="card-header bg-white d-flex justify-content-between align-items-center py-3"
@@ -234,4 +269,41 @@
         </div>
     </div>
 </div>
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+<script>
+const ctx = document.getElementById('chartVotes');
+if (ctx) {
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: {!! json_encode($chartLabels) !!},
+            datasets: [{
+                label: 'Votes',
+                data: {!! json_encode($chartData) !!},
+                backgroundColor: 'rgba(30,58,95,.75)',
+                hoverBackgroundColor: '#C8A951',
+                borderRadius: 6,
+                borderSkipped: false,
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: ctx => ` ${ctx.parsed.y} vote(s)`
+                    }
+                }
+            },
+            scales: {
+                y: { beginAtZero: true, ticks: { precision: 0 }, grid: { color: '#f0f2f5' } },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+}
+</script>
+@endpush
 @endsection

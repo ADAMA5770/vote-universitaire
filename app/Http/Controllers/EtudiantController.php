@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\LogActivite;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -30,13 +31,15 @@ class EtudiantController extends Controller
         ]);
 
         // [SÉCURITÉ] Protection XSS sur les champs texte
-        User::create([
+        $etudiant = User::create([
             'name'            => strip_tags($validated['name']),
             'numero_etudiant' => strip_tags($validated['numero_etudiant']),
             'email'           => $validated['email'],
             'password'        => Hash::make($validated['password']),
             'role'            => 'etudiant',
         ]);
+
+        LogActivite::log('etudiant_cree', "Compte étudiant créé : {$etudiant->name} ({$etudiant->numero_etudiant})");
 
         return redirect()->route('admin.etudiants.index')
             ->with('success', "Compte étudiant créé pour « {$validated['name']} ».");
@@ -51,6 +54,8 @@ class EtudiantController extends Controller
 
         $nom = $user->name;
         $user->delete();
+
+        LogActivite::log('etudiant_supprime', "Compte étudiant supprimé : {$nom}");
 
         return redirect()->route('admin.etudiants.index')
             ->with('success', "Compte de « {$nom} » supprimé.");

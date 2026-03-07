@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\LogActivite;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -41,6 +42,8 @@ class LoginController extends Controller
         Auth::login($user, $request->boolean('remember'));
         $request->session()->regenerate();
 
+        LogActivite::log('connexion', "Connexion de {$user->name} ({$user->role})");
+
         if ($user->isAdmin()) {
             return redirect()->route('admin.dashboard');
         }
@@ -50,6 +53,7 @@ class LoginController extends Controller
 
     public function logout(Request $request)
     {
+        LogActivite::log('deconnexion', 'Déconnexion');
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();

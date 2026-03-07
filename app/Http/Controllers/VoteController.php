@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Election;
+use App\Models\LogActivite;
 use App\Models\Vote;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Database\QueryException;
@@ -49,6 +50,8 @@ class VoteController extends Controller
             return back()->with('error', 'Vous avez déjà voté pour cette élection.');
         }
 
+        LogActivite::log('vote', "Vote pour « {$candidat->prenom} {$candidat->nom} » dans « {$election->titre} »");
+
         return redirect()->route('elections.resultats', $election)
             ->with('success', 'Votre vote a été enregistré avec succès !');
     }
@@ -88,6 +91,37 @@ class VoteController extends Controller
         $pdf->setPaper('A4', 'portrait');
 
         return $pdf->download('resultats-' . Str::slug($election->titre) . '.pdf');
+    }
+
+    public function historique()
+    {
+        $votes = Auth::user()->votes()
+            ->with(['election', 'candidat'])
+            ->orderBy('voted_at', 'desc')
+            ->get();
+
+        return view('etudiant.historique', compact('votes'));
+    }
+
+    public function bulletinPdf(Election $election)
+    {
+        // Seuls les étudiants ayant voté dans cette élection peuvent télécharger leur bulletin
+        $vote = Auth::user()->votes()
+            ->where('election_id', $election->id)
+            ->with(['candidat', 'user'])
+            ->first();
+
+        if (!$vote) {
+            return redirect()->route('elections.show', $election)
+                ->with('error', 'Vous devez voter pour obtenir un bulletin.');
+        }
+
+        $hash = substr(hash('sha256', $vote->user_id . $vote->election_id . $vote->voted_at), 0, 12);
+
+        $pdf = Pdf::loadView('elections.bulletin-pdf', compact('election', 'vote', 'hash'));
+        $pdf->setPaper('A4', 'portrait');
+
+        return $pdf->download('bulletin-vote-' . Str::slug($election->titre) . '.pdf');
     }
 
     // Méthode partagée : construit le tableau des résultats

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Election;
+use App\Models\LogActivite;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -57,7 +58,9 @@ class ElectionController extends Controller
         $validated['titre']       = strip_tags($validated['titre']);
         $validated['description'] = isset($validated['description']) ? strip_tags($validated['description']) : null;
 
-        Election::create($validated);
+        $election = Election::create($validated);
+
+        LogActivite::log('election_creee', "Élection « {$election->titre} » créée");
 
         return redirect()->route('admin.elections.index')
             ->with('success', 'Élection créée avec succès.');
@@ -111,7 +114,10 @@ class ElectionController extends Controller
                     . "{$nbVotes} vote(s) ont déjà été enregistrés. Clôturez l'élection à la place.");
         }
 
+        $titre = $election->titre;
         $election->delete();
+
+        LogActivite::log('election_supprimee', "Élection « {$titre} » supprimée");
 
         return redirect()->route('admin.elections.index')
             ->with('success', 'Élection supprimée avec succès.');
